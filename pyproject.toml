@@ -3,9 +3,9 @@ requires = ["setuptools",]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "src"
+name = "FineTuning"
 version = "0.0.1"
-description = "no code agents"
+description = "Lora configs for Agent Forge"
 readme = "README.md"
 requires-python = ">=3.13,<3.14" #pyarrow doesn't have 3.14 support
 keywords = []
@@ -22,3 +22,5 @@ dependencies = [
     "pytest-timeout",
     "isort"
 ]
+
+
