@@ -1,0 +1,5 @@
+text,metadata,word_count,sentence_count
+this is a sample text with mixed case.,"{'source': 'test', 'date': '2025-10-28'}",8,1
+this is a duplicate text entry,"{'source': 'test', 'date': '2025-10-28'}",6,1
+this is a very short txt,"{'source': 'test', 'date': '2025-10-28'}",6,1
+this is a text with special characters: @#$%,"{'source': 'test', 'date': '2025-10-28'}",8,1

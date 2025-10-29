@@ -1,0 +1,38 @@
+[
+  {
+    "text": "this is a sample text with mixed case.",
+    "metadata": {
+      "source": "test",
+      "date": "2025-10-28"
+    },
+    "word_count": 8,
+    "sentence_count": 1
+  },
+  {
+    "text": "this is a duplicate text entry",
+    "metadata": {
+      "source": "test",
+      "date": "2025-10-28"
+    },
+    "word_count": 6,
+    "sentence_count": 1
+  },
+  {
+    "text": "this is a very short txt",
+    "metadata": {
+      "source": "test",
+      "date": "2025-10-28"
+    },
+    "word_count": 6,
+    "sentence_count": 1
+  },
+  {
+    "text": "this is a text with special characters: @#$%",
+    "metadata": {
+      "source": "test",
+      "date": "2025-10-28"
+    },
+    "word_count": 8,
+    "sentence_count": 1
+  }
+]
