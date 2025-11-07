@@ -1,0 +1,17 @@
+services:
+  mongo:
+    image: mongo:8
+    container_name: my-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: database_1
+    volumes:
+      - /src/DataPreProcessing/initdb
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
