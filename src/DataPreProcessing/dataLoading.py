@@ -6,6 +6,7 @@ import pandas as pd
 class Data:
 
     # mongo db document passed in here
+
     def __init__(self) -> None:
         self.client = MongoClient("mongodb://root:password@localhost:27017/")
         self.db = self.client["test_database"]
@@ -23,4 +24,5 @@ class Data:
         data = list(collection.find())
         df = pd.DataFrame(data)
         df.to_csv(f"{collection_name}.csv")
+
 
