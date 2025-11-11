@@ -1,6 +1,6 @@
 from datasets import Dataset
 import pandas as pd
-import data_utils
+from . import data_utils
 
 class DatasetReader:
     def __init__(self, dataset_or_path, file_type="csv", keep_extra_fields=True):
@@ -40,8 +40,8 @@ class DatasetReader:
         if not self.input_fields and len(self.field_names) > 0:
             self.input_fields = [self.field_names[0]]
 
-        # Output fields: all remaining columns not in input
-        self.output_fields = [f for f in self.field_names if f not in self.input_fields]
+        if not self.output_fields and len(self.field_names) > 1:
+            self.output_fields = [self.field_names[1]]
 
         # Extra fields to keep (optional)
         if self.keep_extra_fields:
@@ -70,3 +70,36 @@ class DatasetReader:
 
         records = [make_row(r) for r in self.df.to_dict(orient="records")]
         return Dataset.from_list(records)
+
+    def to_cleaning_format(self):
+        """
+        Convert dataset to format compatible with cleaning pipeline.
+
+        Returns dict records with 'text' field that cleaning steps expect.
+        This bridges DatasetReader output with CleaningStep input requirements.
+
+        Returns:
+            List of dict records with 'text' field and metadata
+        """
+        records = []
+        for row in self.df.to_dict(orient="records"):
+            # Combine input fields into 'text' field for cleaning
+            input_text = " ".join([str(row[f]) for f in self.input_fields if f in row])
+
+            # Create record with 'text' field
+            record = {"text": input_text}
+
+            # Add output fields as metadata if they exist
+            if self.output_fields:
+                output_text = " ".join([str(row[f]) for f in self.output_fields if f in row])
+                record["output"] = output_text
+
+            # Add extra fields as metadata
+            if self.keep_extra_fields and self.extra_fields:
+                metadata = {f: row[f] for f in self.extra_fields if f in row}
+                if metadata:
+                    record["metadata"] = metadata
+
+            records.append(record)
+
+        return records
