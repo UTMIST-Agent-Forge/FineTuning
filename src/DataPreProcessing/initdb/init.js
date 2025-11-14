@@ -1,10 +1,13 @@
 db = db.getSiblingDB("test_database");
 
-db.createCollection("collection1");
+db.createCollection("rawData");
 
-db.collection1.insertMany([
-    { name: "Alice", email: "alice@example.com" },
-    { name: "Bob", email: "bob@example.com" }
-]);
+db.createCollection("standardizerStep");
+db.createCollection("removeDuplicatesStep");
+db.createCollection("extractMetaDataStep");
+db.createCollection("qualityFilterStep");
+
+db.createCollection("finalProcessedData");
+
 
 print("Database initialized successfully!");
