@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Set, Union
 
-from .cleaningStep import CleaningStep, Record
+from cleaningStep import CleaningStep, Record
 
 
 class RemoveDuplicates(CleaningStep):

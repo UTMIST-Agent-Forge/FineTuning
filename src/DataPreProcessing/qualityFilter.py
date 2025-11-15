@@ -1,6 +1,6 @@
 from typing import Any, Dict, Union
 
-from .cleaningStep import CleaningStep, Record
+from cleaningStep import CleaningStep, Record
 
 
 class QualityFilter(CleaningStep):

@@ -1,7 +1,7 @@
 import re
 from typing import Any, Dict, Union
 
-from .cleaningStep import CleaningStep, Record
+from cleaningStep import CleaningStep, Record
 
 
 class Standardizer(CleaningStep):

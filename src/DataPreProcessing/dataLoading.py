@@ -7,10 +7,12 @@ class Data:
 
     # mongo db document passed in here
 
-    def __init__(self) -> None:
-        self.client = MongoClient("mongodb://root:password@localhost:27017/")
-        self.db = self.client["test_database"]
+    def __init__(self, document_id) -> None:
+        client = MongoClient("mongodb://root:password@localhost:27017/?authSource=admin")
+        self.db = client["test_database_1"]
         self.items_collection = self.db["collection1"]
+        doc = self.items_collection.find_one({"_id": document_id})
+        self.records = pd.DataFrame([doc])
 
     # export back to mongo db
     def load_csv(self, csv_file: csv) -> None:

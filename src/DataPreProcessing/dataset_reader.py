@@ -1,6 +1,5 @@
 from datasets import Dataset
 import pandas as pd
-from . import data_utils
 
 class DatasetReader:
     def __init__(self, dataset_or_path, file_type="csv", keep_extra_fields=True):
