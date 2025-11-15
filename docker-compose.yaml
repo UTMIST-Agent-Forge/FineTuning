@@ -10,7 +10,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: database_1
     volumes:
-      - /src/DataPreProcessing/initdb
       - mongo_data:/data/db
   mongo-express:
     image: mongo-express
