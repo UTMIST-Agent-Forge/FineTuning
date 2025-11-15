@@ -44,7 +44,7 @@ class DataPreProcessingController():
 
 
 
-# below is basic example of getting printing records stored in mongodb after the controller retreives them, in practice the document itself would already be in the db at this point
+# below is basic example of getting printing records stored in mongodb after the controller retreives, in practice the document itself would already be in the db at this point
 def test_run():
     client = MongoClient("mongodb://root:password@localhost:27017/?authSource=admin")
     db = client["test_database_1"]
