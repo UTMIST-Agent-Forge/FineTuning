@@ -1,0 +1,37 @@
+[
+    {
+        "text": "This is a sample text with MIXED case.",
+        "metadata": {
+            "source": "test",
+            "date": "2025-10-28"
+        }
+    },
+    {
+        "text": "This is a duplicate text entry",
+        "metadata": {
+            "source": "test",
+            "date": "2025-10-28"
+        }
+    },
+    {
+        "text": "This is a duplicate text entry",
+        "metadata": {
+            "source": "test",
+            "date": "2025-10-28"
+        }
+    },
+    {
+        "text": "This is a very short txt",
+        "metadata": {
+            "source": "test",
+            "date": "2025-10-28"
+        }
+    },
+    {
+        "text": "This is a text with special characters: @#$%",
+        "metadata": {
+            "source": "test",
+            "date": "2025-10-28"
+        }
+    }
+]
