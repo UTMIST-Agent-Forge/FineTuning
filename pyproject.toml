@@ -23,7 +23,8 @@ dependencies = [
     "isort", 
     "pandas", 
     "pymongo", 
-    "datasets"
+    "datasets", 
+    "peft"
 ]
 
 

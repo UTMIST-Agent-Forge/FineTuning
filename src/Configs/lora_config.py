@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+import torch
 
 @dataclass
-class LoraConfiguration:
+class LoraConfig:
     """
     Configuration for Low-Rank Adaptation (LoRA) fine-tuning.
     
@@ -22,6 +23,7 @@ class LoraConfiguration:
     bias: str = "none"
     task_type: str = "CAUSAL_LM"
     modules_to_save: Optional[List[str]] = None
+    quantization: str = "4-bit"
 
     def to_dict(self):
         """Returns the configuration as a dictionary."""
@@ -34,3 +36,35 @@ class LoraConfiguration:
             "task_type": self.task_type,
             "modules_to_save": self.modules_to_save
         }
+
+        
+@dataclass 
+class TrainingParams:
+    epochs: int
+    batch_size: int
+    training_data_path: str
+    train_test_split: float
+    grad_accumulation_steps: int 
+    learning_rate: float
+    weight_decay: float
+    max_grad_norm: float
+    save_every: int
+    optimizer: str = "adam"
+    data_type: str = "bfloat16"
+    device_map: str = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+class TrainingConfig:
+    model_name: str
+    lora_config: LoraConfig
+    training_params: TrainingParams
+    dataset_path: str #this can be changed depending on how we're storing the data 
+    
+
+
+    
+
+
+
+    
+    
