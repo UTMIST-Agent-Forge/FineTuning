@@ -19,6 +19,7 @@ from tqdm import tqdm
 import json
 
 from Configs.lora_config import LoraConfig, TrainingConfig, TrainingParams
+from DataPreProcessing.dataset_reader import DatasetReader
 
 # Set up logging
 logging.basicConfig(
@@ -372,11 +373,52 @@ class LoRATrainer:
         self.save_checkpoint(self.training_params.epochs, train_metrics)
 
 
+class TextDataset(Dataset):
+    """
+    Dataset for text data.
+    """
+    def __init__(self, texts: list[str], tokenizer: PreTrainedTokenizer, max_length: int = 512):
+        self.texts = texts
+        self.tokenizer = tokenizer
+        self.max_length = max_length
+
+    def __len__(self):
+        return len(self.texts)
+
+    def __getitem__(self, idx):
+        text = str(self.texts[idx])
+        
+        # Tokenize
+        encoding = self.tokenizer(
+            text,
+            truncation=True,
+            max_length=self.max_length,
+            padding="max_length",
+            return_tensors="pt"
+        )
+        
+        # Remove batch dimension added by tokenizer
+        input_ids = encoding["input_ids"]
+        attention_mask = encoding["attention_mask"]
+        
+        # Ensure tensors and squeeze batch dimension
+        if torch.is_tensor(input_ids):
+            input_ids = input_ids.squeeze(0)
+        if torch.is_tensor(attention_mask):
+            attention_mask = attention_mask.squeeze(0)
+        
+        return {
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "labels": input_ids.clone() if torch.is_tensor(input_ids) else input_ids  # For causal LM
+        }
+
+
 def create_dataset_from_path(
     data_path: str,
-    tokenizer: AutoTokenizer,
+    tokenizer: PreTrainedTokenizer,
     max_length: int = 512
-) -> Dataset:
+) -> TextDataset:
     """
     Create a dataset from a file path.
     
@@ -388,9 +430,36 @@ def create_dataset_from_path(
     Returns:
         PyTorch Dataset
     """
-    # TODO: Implement based on your data format
-    # This is a placeholder - adjust based on your actual data format
-    raise NotImplementedError("Implement based on your data format (JSON, CSV, etc.)")
+    # Determine file type from extension
+    data_path_str = str(data_path)
+    file_type = "csv"
+    if data_path_str.endswith(".json") or data_path_str.endswith(".jsonl"):
+        file_type = "json"
+    elif data_path_str.endswith(".parquet"):
+        file_type = "parquet"
+        
+    # Load data using DatasetReader
+    try:
+        reader = DatasetReader(data_path, file_type=file_type)
+        reader.auto_detect_fields()
+        
+        if not reader.input_fields:
+            logger.warning("No input fields detected automatically. Using the first column.")
+            if not reader.df.columns.empty:
+                text_column = reader.df.columns[0]
+            else:
+                raise ValueError("Dataset is empty or has no columns")
+        else:
+            text_column = reader.input_fields[0]
+            
+        logger.info(f"Using column '{text_column}' as input text")
+        texts = reader.df[text_column].tolist()
+        
+        return TextDataset(texts, tokenizer, max_length)
+        
+    except Exception as e:
+        logger.error(f"Error creating dataset: {e}")
+        raise e
 
 
 def main():
@@ -433,17 +502,28 @@ def main():
     # Load model
     trainer.load_model()
     
-    # Load and prepare datasets
-    # TODO: Implement dataset loading based on your data format
-    # train_dataset = create_dataset_from_path(
-    #     training_params.training_data_path,
-    #     trainer.tokenizer
-    # )
-    # val_dataset = ...  # Split or load separately
-    
-    # Start training
-    # trainer.train(train_dataset, val_dataset)
+    if trainer.tokenizer is None:
+        raise ValueError("Tokenizer not initialized")
 
+    # Load and prepare datasets
+    try:
+        full_dataset = create_dataset_from_path(
+            training_params.training_data_path,
+            trainer.tokenizer
+        )
+        
+        # Split into train and validation
+        train_size = int(training_params.train_test_split * len(full_dataset))
+        val_size = len(full_dataset) - train_size
+        train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
+        
+        logger.info(f"Dataset split: {len(train_dataset)} training, {len(val_dataset)} validation")
+        
+        # Start training
+        trainer.train(train_dataset, val_dataset)
+        
+    except Exception as e:
+        logger.error(f"Failed to start training: {e}")
 
 if __name__ == "__main__":
     main()
