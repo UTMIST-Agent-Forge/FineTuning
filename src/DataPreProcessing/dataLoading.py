@@ -3,12 +3,10 @@ import io
 import os
 import csv
 import pandas as pd
-from dotenv import load_dotenv
 import supabase
 
-load_dotenv()
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.environ["SUPABASE_KEY"]
+SUPABASE_URL = os.environ["SUPABASE_URL"]
 
 TRAINING_DATA_BUCKET = "lora_training_data"
 RAW_DATA_FOLDER = "raw_data"
