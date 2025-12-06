@@ -9,8 +9,6 @@ from qualityFilter import QualityFilter
 from removeDuplicates import RemoveDuplicates
 from extractMetaData import Metadata
 
-from pymongo import MongoClient
-
 class DataPreProcessingController():
 
     def __init__(self, document_id: str):        
@@ -41,16 +39,3 @@ class DataPreProcessingController():
             after = len(self.cleaned_records)
             print(f"   {step_name}: {before} -> {after} records")
 
-
-
-
-# below is basic example of getting printing records stored in mongodb after the controller retreives, in practice the document itself would already be in the db at this point
-def test_run():
-    client = MongoClient("mongodb://root:password@localhost:27017/?authSource=admin")
-    db = client["test_database_1"]
-    collection = db["collection1"]
-    doc = {"field1": "value", "field2": 123}
-    result = collection.insert_one(doc)
-
-    controller = DataPreProcessingController(result.inserted_id)
-    print(controller.records)

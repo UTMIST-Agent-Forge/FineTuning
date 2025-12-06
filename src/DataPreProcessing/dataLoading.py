@@ -1,30 +1,40 @@
 # loads from mongo db
-from pymongo import MongoClient
+import io
+import os
 import csv
 import pandas as pd
+from dotenv import load_dotenv
+import supabase
+
+load_dotenv()
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+
+TRAINING_DATA_BUCKET = "lora_training_data"
+RAW_DATA_FOLDER = "raw_data"
+FINAL_PROCESSED_DATA_FOLDER = "processed_data"
+
+sb_client = supabase.create_client(SUPABASE_URL, SUPABASE_KEY)
 
 class Data:
 
-    # mongo db document passed in here
+    def __init__(self, document_name) -> None:
+        self.document_name = document_name
+        res = sb_client.storage.from_(TRAINING_DATA_BUCKET).download(f"{RAW_DATA_FOLDER}/{document_name}")
+        self.records = pd.read_csv(io.BytesIO(res))
+        print(self.records)
+    
+    def export_back(self, folder=FINAL_PROCESSED_DATA_FOLDER):
+        csv_buffer = io.StringIO()
+        self.records.to_csv(csv_buffer, index=False)
+        csv_bytes = csv_buffer.getvalue().encode("utf-8")
 
-    def __init__(self, document_id) -> None:
-        client = MongoClient("mongodb://root:password@localhost:27017/?authSource=admin")
-        self.db = client["test_database_1"]
-        self.items_collection = self.db["collection1"]
-        doc = self.items_collection.find_one({"_id": document_id})
-        self.records = pd.DataFrame([doc])
+        file_path = f"{folder}/{self.document_name}"
 
-    # export back to mongo db
-    def load_csv(self, csv_file: csv) -> None:
-        with open(csv_file, newline='') as f:
-            reader = csv.DictReader(f)
-            data = list(reader)
-        self.items_collection.insert_many(data)
+        response = sb_client.storage.from_(TRAINING_DATA_BUCKET).upload(
+            file_path,
+            csv_bytes,
+            file_options={"content-type": "text/csv", "upsert": "true"}
+        )
 
-    def export_csv(self, collection_name: str) -> None:
-        collection = self.db[collection_name]
-        data = list(collection.find())
-        df = pd.DataFrame(data)
-        df.to_csv(f"{collection_name}.csv")
-
-
+        return response
